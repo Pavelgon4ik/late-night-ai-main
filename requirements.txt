@@ -1,0 +1,9 @@
+aiohttp
+aiohttp-cors
+Flask
+pytchat
+requests
+openai
+dotenv
+load_dotenv
+jsonify

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор диалога</title>
+</head>
+<body>
+    <div id="intro">
+        <h1>Жириновский и Гордон: Генерация диалога</h1>
+        <p>Загрузка...</p>
+    </div>
+
+    <div id="dialog" style="display:none;">
+        <div id="character1">
+            <img id="character1-image" src="" alt="Жириновский" width="150">
+            <p id="character1-text"></p>
+        </div>
+        <div id="character2">
+            <img id="character2-image" src="" alt="Гордон" width="150">
+            <p id="character2-text"></p>
+        </div>
+    </div>
+
+    <script>
+        let currentSceneIndex = 0;
+
+        // Функция для запроса сценария с сервера
+        async function getScenario() {
+            try {
+                const response = await fetch('http://127.0.0.1:8080/story/getScenario');
+                const data = await response.json();
+
+                if (data.status) {
+                    document.getElementById('intro').style.display = 'none';
+                    document.getElementById('dialog').style.display = 'block';
+
+                    // Запускаем показ сцен
+                    showNextScene(data.scenario);
+                } else {
+                    console.error("Ошибка получения сценария");
+                }
+            } catch (error) {
+                console.error("Ошибка при запросе сценария", error);
+            }
+        }
+
+        // Функция для отображения сцен диалога с задержкой
+        function showNextScene(scenario) {
+            if (currentSceneIndex < scenario.length) {
+                const scene = scenario[currentSceneIndex];
+
+                // Определяем, какой персонаж говорит
+                const character = currentSceneIndex % 2 === 0 ? 'character1' : 'character2';
+
+                // Обновляем текст и изображение для текущего персонажа
+                document.getElementById(`${character}-text`).textContent = scene.text;
+                document.getElementById(`${character}-image`).src = scene.image;
+
+                currentSceneIndex++;
+
+                // Задержка перед показом следующей сцены
+                setTimeout(() => showNextScene(scenario), 3000);  // Задержка 3 секунды
+            }
+        }
+
+        // Инициализация запроса сценария при загрузке страницы
+        window.onload = getScenario;
+    </script>
+</body>
+</html>
